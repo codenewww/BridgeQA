@@ -36,6 +36,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+#将多标签数据转换为one-hot编码
 def multilabel_onehot(multiple_labels, bs, num_labels):
     ones = torch.ones(bs, num_labels).to(multiple_labels).float()
     onehot = torch.zeros(bs, num_labels).to(ones).float()
@@ -220,6 +221,7 @@ class ScanQA(nn.Module):
             nn.Linear(proposal_size, hidden_size), nn.GELU()
         )
 
+        #使用了blip,就不需要额外的语言特征提取模块
         if use_blip:
             self.enc_list_o = nn.ModuleList([SA(hidden_size, mcan_num_heads, mcan_pdrop) for _ in range(mcan_num_layers)])
 
@@ -337,6 +339,7 @@ class ScanQA(nn.Module):
             self.load_state_dict(votenet_dict, strict=False)
 
 
+    #返回物体性标签和物体分配。 object_assignment 是一个索引张量，指示每个提议所关联的最近的真实物体的索引。
     def compute_object_assignment(self, data_dict):
         """Compute objectness loss for the proposals.
 
@@ -490,6 +493,7 @@ class ScanQA(nn.Module):
         #                                      #
         ########################################
         # --- QA
+        #先对解码器预训练，为VQA用的blip做前提
         if not self.use_blip:
             # This mainly used for detector pretrain, we don't need to compute QA branch, so don't need to load BLIP
             #######################################
@@ -640,6 +644,7 @@ class ScanQA(nn.Module):
 
                 depth_map = None
 
+                #判断是否从原始图像提取第一视角图像
                 if self.use_vilt:
                     print(data_dict["images_raw"].shape)
                     print("use vilt")
