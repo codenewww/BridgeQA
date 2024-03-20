@@ -644,6 +644,7 @@ class ScanQA(nn.Module):
 
                 depth_map = None
 
+               
                 #判断是否从原始图像提取第一视角图像
                 if self.use_vilt:
                     print(data_dict["images_raw"].shape)
